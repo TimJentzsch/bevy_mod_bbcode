@@ -48,6 +48,14 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 See `examples` for more usage patterns!
 
+### Supported Tags
+
+| Tag                      | Usage        |
+| ------------------------ | ------------ |
+| `[b]bold[/b]`            | Bold text    |
+| `[i]italic[/i]`          | Italic text  |
+| `[c=#ff00ff]colored[/c]` | Colored text |
+
 ## License
 
 This project is licensed under the terms of the [MIT](LICENSE-MIT) or [Apache 2.0](LICENSE-APACHE) license at your choice.
