@@ -43,7 +43,7 @@ pub struct BbcodeBundle {
     pub transform: Transform,
     /// The global transform of the node
     ///
-    /// This component is automatically updated by the [`TransformPropagate`](`bevy_transform::TransformSystem::TransformPropagate`) systems.
+    /// This component is automatically updated by the `TransformPropagate` systems.
     /// To alter the position of the `NodeBundle`, use the properties of the [`Style`] component.
     pub global_transform: GlobalTransform,
     /// Describes the visibility properties of the node
