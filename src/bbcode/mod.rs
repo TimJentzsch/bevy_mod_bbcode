@@ -1,5 +1,8 @@
 use std::{collections::HashMap, fmt::Display, sync::Arc};
 
+pub mod parser;
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum BbcodeNode {
     Tag(BbcodeTag),
     Text(String),
@@ -14,6 +17,7 @@ impl Display for BbcodeNode {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BbcodeTag {
     /// The name of the tag, e.g. `tag` for `[tag]something[/tag]`.
     name: String,
