@@ -49,6 +49,12 @@ impl BbcodeTag {
         self
     }
 
+    /// Add a simple parameter to the tag.
+    pub fn add_simple_param<P: Into<String>>(&mut self, tag_param: P) -> &mut Self {
+        self.simple_param = Some(tag_param.into());
+        self
+    }
+
     /// Add a key/value parameter.
     pub fn with_param<K: Into<String>, V: Into<String>>(mut self, key: K, value: V) -> Self {
         self.complex_params.insert(key.into(), value.into());
@@ -75,6 +81,11 @@ impl BbcodeTag {
     /// The child nodes of this tag.
     pub fn children(&self) -> &Vec<Arc<BbcodeNode>> {
         &self.children
+    }
+
+    /// If it exists, the simple tag parameter of this tag.
+    pub fn simple_param(&self) -> &Option<String> {
+        &self.simple_param
     }
 }
 

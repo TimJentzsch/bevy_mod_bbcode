@@ -10,6 +10,7 @@ use super::bbcode::{Bbcode, BbcodeSettings};
 struct BbcodeStyle {
     is_bold: bool,
     is_italic: bool,
+    color: Color,
 }
 
 impl BbcodeStyle {
@@ -24,6 +25,22 @@ impl BbcodeStyle {
                 is_italic: true,
                 ..self.clone()
             },
+            "c" | "color" => {
+                if let Some(color) = tag.simple_param() {
+                    if let Ok(color) = Srgba::hex(color.trim()) {
+                        Self {
+                            color: color.into(),
+                            ..self.clone()
+                        }
+                    } else {
+                        warn!("Invalid bbcode color {color}");
+                        self.clone()
+                    }
+                } else {
+                    warn!("Missing bbcode color on [{}] tag", tag.name());
+                    self.clone()
+                }
+            }
             _ => self.clone(),
         }
     }
@@ -58,6 +75,7 @@ pub fn convert_bbcode(
             BbcodeStyle {
                 is_bold: false,
                 is_italic: false,
+                color: settings.color,
             },
             &settings,
             &nodes,
@@ -86,7 +104,7 @@ fn construct_recursively(
                         TextStyle {
                             font,
                             font_size: settings.font_size,
-                            color: settings.color,
+                            color: style.color,
                         },
                     ));
                 });
