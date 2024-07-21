@@ -2,6 +2,13 @@
 name = "bevy_mod_bbcode"
 version = "0.1.0"
 edition = "2021"
+description = "Use BBCode-formatted text inside of Bevy."
+readme = "README.md"
+repository = "https://github.com/TimJentzsch/bevy_mod_bbcode"
+license = "MIT OR Apache-2.0"
+keywords = ["gamedev", "bevy"]
+categories = ["game-development"]
+exclude = ["assets/**/*", ".github/**/*"]
 
 [dependencies]
 nom = "7.1.3"
