@@ -15,7 +15,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn(Camera2dBundle::default());
 
     commands.spawn(BbcodeBundle::from_content(
-        "test",
+        "test [b]bold[/b] with [i]italic[/i]",
         BbcodeSettings {
             regular_font: asset_server.load("fonts/FiraSans-Regular.ttf"),
             bold_font: asset_server.load("fonts/FiraSans-Bold.ttf"),
