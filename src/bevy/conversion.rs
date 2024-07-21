@@ -2,12 +2,32 @@ use std::sync::Arc;
 
 use bevy::{ecs::system::EntityCommands, prelude::*};
 
-use crate::bbcode::{parser::parse_bbcode, BbcodeNode};
+use crate::bbcode::{parser::parse_bbcode, BbcodeNode, BbcodeTag};
 
-use super::{
-    bbcode::{Bbcode, BbcodeStyle},
-    settings::BbcodeSettings,
-};
+use super::bbcode::{Bbcode, BbcodeSettings};
+
+#[derive(Debug, Clone)]
+struct BbcodeStyle {
+    is_bold: bool,
+    is_italic: bool,
+}
+
+impl BbcodeStyle {
+    /// Change the style according to the tag.
+    fn apply_tag(&self, tag: &BbcodeTag) -> Self {
+        match tag.name() {
+            "b" => Self {
+                is_bold: true,
+                ..self.clone()
+            },
+            "i" => Self {
+                is_italic: true,
+                ..self.clone()
+            },
+            _ => self.clone(),
+        }
+    }
+}
 
 pub fn convert_bbcode(
     mut commands: Commands,
@@ -57,7 +77,7 @@ fn construct_recursively(
                 let font = match (style.is_bold, style.is_italic) {
                     (true, _) => settings.bold_font.clone(),
                     (_, true) => settings.italic_font.clone(),
-                    (false, false) => settings.normal_font.clone(),
+                    (false, false) => settings.regular_font.clone(),
                 };
 
                 entity_commands.with_children(|builder| {
