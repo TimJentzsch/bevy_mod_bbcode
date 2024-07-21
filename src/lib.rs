@@ -1,4 +1,5 @@
 pub mod bbcode;
+pub mod bevy;
 
 pub fn add(left: usize, right: usize) -> usize {
     left + right

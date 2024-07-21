@@ -66,6 +66,16 @@ impl BbcodeTag {
         self.children.push(Arc::new(BbcodeNode::Text(text.into())));
         self
     }
+
+    /// The name of this tag.
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    /// The child nodes of this tag.
+    pub fn children(&self) -> &Vec<Arc<BbcodeNode>> {
+        &self.children
+    }
 }
 
 impl Display for BbcodeTag {
