@@ -85,10 +85,8 @@ fn construct_recursively(
                         text.clone(),
                         TextStyle {
                             font,
-                            // Allow font size configuration
-                            font_size: 10.,
-                            // Allow color configuration
-                            color: Color::WHITE,
+                            font_size: settings.font_size,
+                            color: settings.color,
                         },
                     ));
                 });

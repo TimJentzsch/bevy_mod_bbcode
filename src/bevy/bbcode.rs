@@ -12,6 +12,9 @@ pub struct BbcodeSettings {
     pub regular_font: Handle<Font>,
     pub bold_font: Handle<Font>,
     pub italic_font: Handle<Font>,
+
+    pub font_size: f32,
+    pub color: Color,
 }
 
 #[derive(Bundle)]

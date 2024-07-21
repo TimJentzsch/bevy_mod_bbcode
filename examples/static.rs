@@ -20,6 +20,9 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             regular_font: asset_server.load("fonts/FiraSans-Regular.ttf"),
             bold_font: asset_server.load("fonts/FiraSans-Bold.ttf"),
             italic_font: asset_server.load("fonts/FiraSans-Italic.ttf"),
+
+            font_size: 40.,
+            color: Color::WHITE,
         },
     ));
 }
