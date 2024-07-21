@@ -1,8 +1,5 @@
 use bevy::prelude::*;
-use bevy_mod_bbcode::bevy::{
-    bbcode::{Bbcode, BbcodeBundle, BbcodeSettings},
-    plugin::BbcodePlugin,
-};
+use bevy_mod_bbcode::{Bbcode, BbcodeBundle, BbcodePlugin, BbcodeSettings};
 
 #[derive(Debug, Component)]
 struct Marker;

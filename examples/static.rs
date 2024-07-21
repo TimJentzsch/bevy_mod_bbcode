@@ -1,8 +1,5 @@
 use bevy::prelude::*;
-use bevy_mod_bbcode::bevy::{
-    bbcode::{BbcodeBundle, BbcodeSettings},
-    plugin::BbcodePlugin,
-};
+use bevy_mod_bbcode::{BbcodeBundle, BbcodePlugin, BbcodeSettings};
 
 fn main() {
     App::new()

@@ -44,6 +44,7 @@ impl BbcodeTag {
     }
 
     /// Add a simple parameter to the tag.
+    #[cfg(test)]
     pub fn with_simple_param<P: Into<String>>(mut self, tag_param: P) -> Self {
         self.simple_param = Some(tag_param.into());
         self
@@ -56,18 +57,21 @@ impl BbcodeTag {
     }
 
     /// Add a key/value parameter.
+    #[cfg(test)]
     pub fn with_param<K: Into<String>, V: Into<String>>(mut self, key: K, value: V) -> Self {
         self.complex_params.insert(key.into(), value.into());
         self
     }
 
     /// Add a nested tag inside this one.
+    #[cfg(test)]
     pub fn with_tag(mut self, tag: BbcodeTag) -> Self {
         self.children.push(Arc::new(BbcodeNode::Tag(tag)));
         self
     }
 
     /// Add text inside of the node.
+    #[cfg(test)]
     pub fn with_text<T: Into<String>>(mut self, text: T) -> Self {
         self.children.push(Arc::new(BbcodeNode::Text(text.into())));
         self
