@@ -8,10 +8,14 @@ use super::bbcode::{Bbcode, BbcodeSettings};
 
 #[derive(Debug, Clone)]
 struct BbcodeContext {
+    /// Whether the text should be written **bold**.
     is_bold: bool,
+    /// Whether the text should be written *italic*.
     is_italic: bool,
+    /// The color of the text.
     color: Color,
 
+    /// Marker components to apply to the spawned `Text`s.
     markers: Vec<String>,
 }
 
@@ -133,7 +137,7 @@ fn construct_recursively(
                         },
                     ));
 
-                    // Apply marker tags
+                    // Apply marker components
                     for marker in &context.markers {
                         if let Some(modifier) = settings.modifiers.modifier_map.get(marker) {
                             modifier(&mut text_commands);
