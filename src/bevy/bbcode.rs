@@ -9,12 +9,42 @@ pub struct Bbcode {
 
 #[derive(Debug, Clone, Component)]
 pub struct BbcodeSettings {
-    pub regular_font: Handle<Font>,
-    pub bold_font: Handle<Font>,
-    pub italic_font: Handle<Font>,
-
     pub font_size: f32,
     pub color: Color,
+
+    pub(crate) regular_font: Option<Handle<Font>>,
+    pub(crate) bold_font: Option<Handle<Font>>,
+    pub(crate) italic_font: Option<Handle<Font>>,
+}
+
+impl BbcodeSettings {
+    pub fn new(font_size: f32, color: Color) -> Self {
+        Self {
+            font_size,
+            color,
+            regular_font: None,
+            bold_font: None,
+            italic_font: None,
+        }
+    }
+
+    /// Add a font to use for regular text.
+    pub fn with_regular_font(mut self, handle: Handle<Font>) -> Self {
+        self.regular_font = Some(handle);
+        self
+    }
+
+    /// Add a font to use for bold text.
+    pub fn with_bold_font(mut self, handle: Handle<Font>) -> Self {
+        self.bold_font = Some(handle);
+        self
+    }
+
+    /// Add a font to use for italic text.
+    pub fn with_italic_font(mut self, handle: Handle<Font>) -> Self {
+        self.italic_font = Some(handle);
+        self
+    }
 }
 
 #[derive(Bundle)]

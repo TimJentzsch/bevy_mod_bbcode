@@ -89,13 +89,21 @@ fn construct_recursively(
     settings: &BbcodeSettings,
     nodes: &Vec<Arc<BbcodeNode>>,
 ) {
+    let default_font = settings.regular_font.clone().unwrap_or_default();
+
     for node in nodes {
         match **node {
             BbcodeNode::Text(ref text) => {
                 let font = match (style.is_bold, style.is_italic) {
-                    (true, _) => settings.bold_font.clone(),
-                    (_, true) => settings.italic_font.clone(),
-                    (false, false) => settings.regular_font.clone(),
+                    (true, _) => default_font.clone(),
+                    (_, true) => settings
+                        .italic_font
+                        .clone()
+                        .unwrap_or_else(|| default_font.clone()),
+                    (false, false) => settings
+                        .regular_font
+                        .clone()
+                        .unwrap_or_else(|| default_font.clone()),
                 };
 
                 entity_commands.with_children(|builder| {

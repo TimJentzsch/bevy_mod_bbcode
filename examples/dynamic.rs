@@ -19,14 +19,10 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         BbcodeBundle::from_content(
             // The text will be added later
             "",
-            BbcodeSettings {
-                regular_font: asset_server.load("fonts/FiraSans-Regular.ttf"),
-                bold_font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                italic_font: asset_server.load("fonts/FiraSans-Italic.ttf"),
-
-                font_size: 40.,
-                color: Color::WHITE,
-            },
+            BbcodeSettings::new(40., Color::WHITE)
+                .with_regular_font(asset_server.load("fonts/FiraSans-Regular.ttf"))
+                .with_bold_font(asset_server.load("fonts/FiraSans-Bold.ttf"))
+                .with_italic_font(asset_server.load("fonts/FiraSans-Italic.ttf")),
         ),
         Marker,
     ));
