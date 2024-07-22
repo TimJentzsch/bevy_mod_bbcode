@@ -1,4 +1,6 @@
-use bevy::{prelude::*, ui::FocusPolicy};
+use std::sync::Arc;
+
+use bevy::{ecs::system::EntityCommands, prelude::*, ui::FocusPolicy, utils::HashMap};
 
 #[derive(Debug, Clone, Component, Default)]
 
@@ -7,7 +9,14 @@ pub struct Bbcode {
     pub content: String,
 }
 
-#[derive(Debug, Clone, Component)]
+type ModifierFn = dyn Fn(&mut EntityCommands) + Send + Sync;
+
+#[derive(Clone, Default)]
+pub(crate) struct Modifiers {
+    pub(crate) modifier_map: HashMap<String, Arc<ModifierFn>>,
+}
+
+#[derive(Clone, Component)]
 pub struct BbcodeSettings {
     pub font_size: f32,
     pub color: Color,
@@ -15,6 +24,8 @@ pub struct BbcodeSettings {
     pub(crate) regular_font: Option<Handle<Font>>,
     pub(crate) bold_font: Option<Handle<Font>>,
     pub(crate) italic_font: Option<Handle<Font>>,
+
+    pub(crate) modifiers: Modifiers,
 }
 
 impl BbcodeSettings {
@@ -25,6 +36,7 @@ impl BbcodeSettings {
             regular_font: None,
             bold_font: None,
             italic_font: None,
+            modifiers: Default::default(),
         }
     }
 
@@ -43,6 +55,21 @@ impl BbcodeSettings {
     /// Add a font to use for italic text.
     pub fn with_italic_font(mut self, handle: Handle<Font>) -> Self {
         self.italic_font = Some(handle);
+        self
+    }
+
+    /// Register a marker component for the `[m]` tag.
+    pub fn with_marker<N: Into<String>, M: Component + Clone>(
+        mut self,
+        tag_name: N,
+        marker: M,
+    ) -> Self {
+        self.modifiers.modifier_map.insert(
+            tag_name.into(),
+            Arc::new(move |commands| {
+                commands.insert(marker.clone());
+            }),
+        );
         self
     }
 }
