@@ -7,13 +7,19 @@ use crate::bbcode::{parser::parse_bbcode, BbcodeNode, BbcodeTag};
 use super::bbcode::{Bbcode, BbcodeSettings};
 
 #[derive(Debug, Clone)]
-struct BbcodeStyle {
+struct BbcodeContext {
+    /// Whether the text should be written **bold**.
     is_bold: bool,
+    /// Whether the text should be written *italic*.
     is_italic: bool,
+    /// The color of the text.
     color: Color,
+
+    /// Marker components to apply to the spawned `Text`s.
+    markers: Vec<String>,
 }
 
-impl BbcodeStyle {
+impl BbcodeContext {
     /// Change the style according to the tag.
     fn apply_tag(&self, tag: &BbcodeTag) -> Self {
         match tag.name() {
@@ -38,6 +44,20 @@ impl BbcodeStyle {
                     }
                 } else {
                     warn!("Missing bbcode color on [{}] tag", tag.name());
+                    self.clone()
+                }
+            }
+            "m" | "marker" => {
+                if let Some(marker) = tag.simple_param() {
+                    let mut markers = self.markers.clone();
+                    markers.push(marker.clone());
+
+                    Self {
+                        markers,
+                        ..self.clone()
+                    }
+                } else {
+                    warn!("Missing marker name on [{}] tag", tag.name());
                     self.clone()
                 }
             }
@@ -72,10 +92,11 @@ pub fn convert_bbcode(
 
         construct_recursively(
             &mut entity_commands,
-            BbcodeStyle {
+            BbcodeContext {
                 is_bold: false,
                 is_italic: false,
                 color: settings.color,
+                markers: Vec::new(),
             },
             &settings,
             &nodes,
@@ -85,34 +106,49 @@ pub fn convert_bbcode(
 
 fn construct_recursively(
     entity_commands: &mut EntityCommands,
-    style: BbcodeStyle,
+    context: BbcodeContext,
     settings: &BbcodeSettings,
     nodes: &Vec<Arc<BbcodeNode>>,
 ) {
+    let default_font = settings.regular_font.clone().unwrap_or_default();
+
     for node in nodes {
         match **node {
             BbcodeNode::Text(ref text) => {
-                let font = match (style.is_bold, style.is_italic) {
-                    (true, _) => settings.bold_font.clone(),
-                    (_, true) => settings.italic_font.clone(),
-                    (false, false) => settings.regular_font.clone(),
+                let font = match (context.is_bold, context.is_italic) {
+                    (true, _) => default_font.clone(),
+                    (_, true) => settings
+                        .italic_font
+                        .clone()
+                        .unwrap_or_else(|| default_font.clone()),
+                    (false, false) => settings
+                        .regular_font
+                        .clone()
+                        .unwrap_or_else(|| default_font.clone()),
                 };
 
                 entity_commands.with_children(|builder| {
-                    builder.spawn(TextBundle::from_section(
+                    let mut text_commands = builder.spawn(TextBundle::from_section(
                         text.clone(),
                         TextStyle {
                             font,
                             font_size: settings.font_size,
-                            color: style.color,
+                            color: context.color,
                         },
                     ));
+
+                    // Apply marker components
+                    for marker in &context.markers {
+                        if let Some(modifier) = settings.modifiers.modifier_map.get(marker) {
+                            modifier(&mut text_commands);
+                        }
+                    }
                 });
             }
 
             BbcodeNode::Tag(ref tag) => construct_recursively(
                 entity_commands,
-                style.apply_tag(tag),
+                context.apply_tag(tag),
                 settings,
                 tag.children(),
             ),
