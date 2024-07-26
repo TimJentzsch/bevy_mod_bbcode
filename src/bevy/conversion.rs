@@ -6,7 +6,9 @@ use crate::bbcode::{parser::parse_bbcode, BbcodeNode, BbcodeTag};
 
 use super::{
     bbcode::{Bbcode, BbcodeSettings},
+    color::{BbCodeColor, BbCodeColored},
     font::FontRegistry,
+    ColorMap,
 };
 
 #[derive(Debug, Clone)]
@@ -16,7 +18,7 @@ struct BbcodeContext {
     /// Whether the text should be written *italic*.
     is_italic: bool,
     /// The color of the text.
-    color: Color,
+    color: BbCodeColor,
 
     /// Marker components to apply to the spawned `Text`s.
     markers: Vec<String>,
@@ -37,13 +39,16 @@ impl BbcodeContext {
             "c" | "color" => {
                 if let Some(color) = tag.simple_param() {
                     if let Ok(color) = Srgba::hex(color.trim()) {
+                        let color: Color = color.into();
                         Self {
                             color: color.into(),
                             ..self.clone()
                         }
                     } else {
-                        warn!("Invalid bbcode color {color}");
-                        self.clone()
+                        Self {
+                            color: color.clone().into(),
+                            ..self.clone()
+                        }
                     }
                 } else {
                     warn!("Missing bbcode color on [{}] tag", tag.name());
@@ -73,6 +78,7 @@ pub fn convert_bbcode(
     mut commands: Commands,
     bbcode_query: Query<(Entity, Ref<Bbcode>, Ref<BbcodeSettings>)>,
     font_registry: Res<FontRegistry>,
+    color_map: Res<ColorMap>,
 ) {
     for (entity, bbcode, settings) in bbcode_query.iter() {
         if !bbcode.is_changed() && !settings.is_changed() && !font_registry.is_changed() {
@@ -99,12 +105,13 @@ pub fn convert_bbcode(
             BbcodeContext {
                 is_bold: false,
                 is_italic: false,
-                color: settings.color,
+                color: settings.color.clone(),
                 markers: Vec::new(),
             },
             &settings,
             &nodes,
             font_registry.as_ref(),
+            color_map.as_ref(),
         )
     }
 }
@@ -115,6 +122,7 @@ fn construct_recursively(
     settings: &BbcodeSettings,
     nodes: &Vec<Arc<BbcodeNode>>,
     font_registry: &FontRegistry,
+    color_map: &ColorMap,
 ) {
     for node in nodes {
         match **node {
@@ -141,9 +149,14 @@ fn construct_recursively(
                         TextStyle {
                             font,
                             font_size: settings.font_size,
-                            color: context.color,
+                            color: context.color.to_color(color_map).unwrap_or(Color::WHITE),
                         },
                     ));
+
+                    // Track named colors for efficient update
+                    if let BbCodeColor::Named(name) = &context.color {
+                        text_commands.insert(BbCodeColored { name: name.clone() });
+                    }
 
                     // Apply marker components
                     for marker in &context.markers {
@@ -160,6 +173,7 @@ fn construct_recursively(
                 settings,
                 tag.children(),
                 font_registry,
+                color_map,
             ),
         }
     }

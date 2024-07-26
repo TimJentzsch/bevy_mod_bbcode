@@ -2,6 +2,8 @@ use std::sync::Arc;
 
 use bevy::{ecs::system::EntityCommands, prelude::*, ui::FocusPolicy, utils::HashMap};
 
+use super::color::BbCodeColor;
+
 #[derive(Debug, Clone, Component, Default)]
 
 pub struct Bbcode {
@@ -20,17 +22,21 @@ pub(crate) struct Modifiers {
 pub struct BbcodeSettings {
     pub font_family: String,
     pub font_size: f32,
-    pub color: Color,
+    pub color: BbCodeColor,
 
     pub(crate) modifiers: Modifiers,
 }
 
 impl BbcodeSettings {
-    pub fn new<F: Into<String>>(font_family: F, font_size: f32, color: Color) -> Self {
+    pub fn new<F: Into<String>, C: Into<BbCodeColor>>(
+        font_family: F,
+        font_size: f32,
+        color: C,
+    ) -> Self {
         Self {
             font_family: font_family.into(),
             font_size,
-            color,
+            color: color.into(),
             modifiers: Default::default(),
         }
     }

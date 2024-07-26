@@ -12,6 +12,33 @@ impl Plugin for ColorPlugin {
     }
 }
 
+#[derive(Debug, Clone)]
+pub enum BbCodeColor {
+    Named(String),
+    Static(Color),
+}
+
+impl BbCodeColor {
+    pub fn to_color(&self, color_map: &ColorMap) -> Option<Color> {
+        match self {
+            Self::Static(color) => Some(*color),
+            Self::Named(name) => color_map.get(name),
+        }
+    }
+}
+
+impl From<Color> for BbCodeColor {
+    fn from(value: Color) -> Self {
+        Self::Static(value)
+    }
+}
+
+impl From<String> for BbCodeColor {
+    fn from(value: String) -> Self {
+        Self::Named(value)
+    }
+}
+
 #[derive(Debug, Resource, Default)]
 pub struct ColorMap {
     /// The map from name to color.
