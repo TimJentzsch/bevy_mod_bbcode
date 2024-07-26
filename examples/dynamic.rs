@@ -10,21 +10,18 @@ struct TimeMarker;
 
 fn main() {
     App::new()
-        .add_plugins((DefaultPlugins, BbcodePlugin))
+        .add_plugins((DefaultPlugins, BbcodePlugin::new().with_fonts("fonts")))
         .add_systems(Startup, setup)
         .add_systems(Update, update)
         .run();
 }
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn setup(mut commands: Commands) {
     commands.spawn(Camera2dBundle::default());
 
     commands.spawn(BbcodeBundle::from_content(
         "Time passed: [m=time]0.0[/m] s",
-        BbcodeSettings::new(40., Color::WHITE)
-            .with_regular_font(asset_server.load("fonts/FiraSans-Regular.ttf"))
-            .with_bold_font(asset_server.load("fonts/FiraSans-Bold.ttf"))
-            .with_italic_font(asset_server.load("fonts/FiraSans-Italic.ttf"))
+        BbcodeSettings::new("Fira Sans", 40., Color::WHITE)
             // Register the marker component for the `m=time` tag
             .with_marker("time", TimeMarker),
     ));
