@@ -3,7 +3,7 @@ use bevy::{
     prelude::*,
 };
 
-use super::{conversion::convert_bbcode, font::FontPlugin};
+use super::{color::ColorPlugin, conversion::convert_bbcode, font::FontPlugin};
 
 #[derive(Debug, Default)]
 pub struct BbcodePlugin {
@@ -31,7 +31,7 @@ impl BbcodePlugin {
 
 impl Plugin for BbcodePlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(FontPlugin)
+        app.add_plugins((FontPlugin, ColorPlugin))
             .add_systems(Update, convert_bbcode);
 
         let asset_server = app.world().resource::<AssetServer>();
