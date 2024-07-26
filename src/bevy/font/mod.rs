@@ -79,12 +79,19 @@ impl FontRegistry {
         self.add(asset_id, font_assets);
     }
 
-    /// Find the best matching font asset for the query.
-    pub fn query(&self, query: &fontdb::Query) -> Option<AssetId<Font>> {
+    /// Find the best matching font asset for the query and return its [`AssetId`].
+    pub fn query_id(&self, query: &fontdb::Query) -> Option<AssetId<Font>> {
         let font_id = self.font_db.query(query);
         font_id
             .and_then(|font_id| self.font_to_asset_id.get(&font_id))
             .copied()
+    }
+
+    /// Find the best matching font asset for the query and return its [`Handle`].
+    ///
+    /// Note that this returns a *weak* handle to the font.
+    pub fn query_handle(&self, query: &fontdb::Query) -> Option<Handle<Font>> {
+        self.query_id(query).map(Handle::Weak)
     }
 }
 

@@ -133,10 +133,7 @@ fn construct_recursively(
                         fontdb::Style::Normal
                     },
                 };
-                let font = font_registry
-                    .query(&font_query)
-                    .map(Handle::Weak)
-                    .unwrap_or_default();
+                let font = font_registry.query_handle(&font_query).unwrap_or_default();
 
                 entity_commands.with_children(|builder| {
                     let mut text_commands = builder.spawn(TextBundle::from_section(
