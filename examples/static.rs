@@ -3,7 +3,7 @@ use bevy_mod_bbcode::{BbcodeBundle, BbcodePlugin, BbcodeSettings};
 
 fn main() {
     App::new()
-        .add_plugins((DefaultPlugins, BbcodePlugin))
+        .add_plugins((DefaultPlugins, BbcodePlugin::new("fonts")))
         .add_systems(Startup, setup)
         .run();
 }

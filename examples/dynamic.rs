@@ -10,7 +10,7 @@ struct TimeMarker;
 
 fn main() {
     App::new()
-        .add_plugins((DefaultPlugins, BbcodePlugin))
+        .add_plugins((DefaultPlugins, BbcodePlugin::new("fonts")))
         .add_systems(Startup, setup)
         .add_systems(Update, update)
         .run();
