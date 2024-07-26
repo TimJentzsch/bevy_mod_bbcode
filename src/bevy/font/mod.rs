@@ -81,8 +81,8 @@ impl FontRegistry {
 
     /// Find the best matching font asset for the query.
     pub fn query(&self, query: &fontdb::Query) -> Option<AssetId<Font>> {
-        self.font_db
-            .query(query)
+        let font_id = self.font_db.query(query);
+        font_id
             .and_then(|font_id| self.font_to_asset_id.get(&font_id))
             .copied()
     }

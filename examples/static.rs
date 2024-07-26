@@ -12,10 +12,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn(Camera2dBundle::default());
 
     commands.spawn(BbcodeBundle::from_content(
-        "test [b]bold[/b] with [i]italic[/i] and [c=#ff00ff]color[/c]",
-        BbcodeSettings::new(40., Color::WHITE)
-            .with_regular_font(asset_server.load("fonts/FiraSans-Regular.ttf"))
-            .with_bold_font(asset_server.load("fonts/FiraSans-Bold.ttf"))
-            .with_italic_font(asset_server.load("fonts/FiraSans-Italic.ttf")),
+        "test [b]bold with [i]italic[/i][/b] and [c=#ff00ff]color[/c]",
+        BbcodeSettings::new("Fira Sans", 40., Color::WHITE),
     ));
 }

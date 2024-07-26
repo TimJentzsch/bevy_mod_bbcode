@@ -4,7 +4,10 @@ use bevy::{ecs::system::EntityCommands, prelude::*};
 
 use crate::bbcode::{parser::parse_bbcode, BbcodeNode, BbcodeTag};
 
-use super::bbcode::{Bbcode, BbcodeSettings};
+use super::{
+    bbcode::{Bbcode, BbcodeSettings},
+    font::FontRegistry,
+};
 
 #[derive(Debug, Clone)]
 struct BbcodeContext {
@@ -69,9 +72,10 @@ impl BbcodeContext {
 pub fn convert_bbcode(
     mut commands: Commands,
     bbcode_query: Query<(Entity, Ref<Bbcode>, Ref<BbcodeSettings>)>,
+    font_registry: Res<FontRegistry>,
 ) {
     for (entity, bbcode, settings) in bbcode_query.iter() {
-        if !bbcode.is_changed() && !settings.is_changed() {
+        if !bbcode.is_changed() && !settings.is_changed() && !font_registry.is_changed() {
             continue;
         }
 
@@ -100,6 +104,7 @@ pub fn convert_bbcode(
             },
             &settings,
             &nodes,
+            font_registry.as_ref(),
         )
     }
 }
@@ -109,23 +114,29 @@ fn construct_recursively(
     context: BbcodeContext,
     settings: &BbcodeSettings,
     nodes: &Vec<Arc<BbcodeNode>>,
+    font_registry: &FontRegistry,
 ) {
-    let default_font = settings.regular_font.clone().unwrap_or_default();
-
     for node in nodes {
         match **node {
             BbcodeNode::Text(ref text) => {
-                let font = match (context.is_bold, context.is_italic) {
-                    (true, _) => default_font.clone(),
-                    (_, true) => settings
-                        .italic_font
-                        .clone()
-                        .unwrap_or_else(|| default_font.clone()),
-                    (false, false) => settings
-                        .regular_font
-                        .clone()
-                        .unwrap_or_else(|| default_font.clone()),
+                let font_query = fontdb::Query {
+                    families: &[fontdb::Family::Name(&settings.font_family)],
+                    weight: if context.is_bold {
+                        fontdb::Weight::BOLD
+                    } else {
+                        fontdb::Weight::NORMAL
+                    },
+                    stretch: fontdb::Stretch::Normal,
+                    style: if context.is_italic {
+                        fontdb::Style::Italic
+                    } else {
+                        fontdb::Style::Normal
+                    },
                 };
+                let font = font_registry
+                    .query(&font_query)
+                    .map(Handle::Weak)
+                    .unwrap_or_default();
 
                 entity_commands.with_children(|builder| {
                     let mut text_commands = builder.spawn(TextBundle::from_section(
@@ -151,6 +162,7 @@ fn construct_recursively(
                 context.apply_tag(tag),
                 settings,
                 tag.children(),
+                font_registry,
             ),
         }
     }

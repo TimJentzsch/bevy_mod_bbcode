@@ -21,10 +21,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
     commands.spawn(BbcodeBundle::from_content(
         "Time passed: [m=time]0.0[/m] s",
-        BbcodeSettings::new(40., Color::WHITE)
-            .with_regular_font(asset_server.load("fonts/FiraSans-Regular.ttf"))
-            .with_bold_font(asset_server.load("fonts/FiraSans-Bold.ttf"))
-            .with_italic_font(asset_server.load("fonts/FiraSans-Italic.ttf"))
+        BbcodeSettings::new("Fira Sans", 40., Color::WHITE)
             // Register the marker component for the `m=time` tag
             .with_marker("time", TimeMarker),
     ));
