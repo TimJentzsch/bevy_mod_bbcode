@@ -20,7 +20,7 @@ fn main() {
         .run();
 }
 
-fn setup(mut commands: Commands, mut color_map: ResMut<ColorMap>) {
+fn setup(mut commands: Commands) {
     commands.spawn(Camera2dBundle::default());
 
     commands.spawn(BbcodeBundle::from_content(
