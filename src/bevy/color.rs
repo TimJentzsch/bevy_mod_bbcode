@@ -59,7 +59,9 @@ impl ColorMap {
         N: Into<String>,
         C: Into<Color>,
     {
-        self.map.insert(name.into(), color.into());
+        let name = name.into();
+        self.map.insert(name.clone(), color.into());
+        self.was_updated.insert(name);
         self
     }
 
