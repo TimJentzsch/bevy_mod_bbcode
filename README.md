@@ -45,12 +45,12 @@ See `examples` for more usage patterns!
 
 ### Supported Tags
 
-| Tag                      | Usage                                                                                     |
-| ------------------------ | ----------------------------------------------------------------------------------------- |
-| `[b]bold[/b]`            | Bold text                                                                                 |
-| `[i]italic[/i]`          | Italic text                                                                               |
-| `[c=#ff00ff]colored[/c]` | Colored text                                                                              |
-| `[m=foo]test[/m]`        | Add a marker component to the `Text` "test", registered via `BbcodeSettings::with_marker` |
+- `b`: \[b]**bold**\[/b] text
+- `i`: \[i]*italic*\[/i] text
+- `c`: \[c=\#ff0000]<span style="color: red">colored</span>\[/c] text
+  - Register named colors via `ResMut<ColorMap>` and use the names instead of hex values
+- `m`: \[m=foo]text with marker component\[/m]
+  - Register marker components via `BbcodeSettings::with_marker` and use them to update text dynamically
 
 ## License
 
