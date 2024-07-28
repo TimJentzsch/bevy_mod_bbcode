@@ -46,11 +46,12 @@ See `examples` for more usage patterns!
 ### Supported Tags
 
 - `b`: \[b]**bold**\[/b] text
-- `i`: \[i]*italic*\[/i] text
+- `i`: \[i]_italic_\[/i] text
 - `c`: \[c=\#ff0000]<span style="color: red">colored</span>\[/c] text
   - Register named colors via `ResMut<ColorMap>` and use the names instead of hex values
 - `m`: \[m=foo]text with marker component\[/m]
   - Register marker components via `BbcodeSettings::with_marker` and use them to update text dynamically
+- `font`: \[font="Fira Sans"]change the font family\[/font]
 
 ## License
 
