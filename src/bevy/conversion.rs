@@ -13,6 +13,8 @@ use super::{
 
 #[derive(Debug, Clone)]
 struct BbcodeContext {
+    /// The name of the font family to use for the text.
+    font_family: String,
     /// Whether the text should be written **bold**.
     is_bold: bool,
     /// Whether the text should be written *italic*.
@@ -69,6 +71,17 @@ impl BbcodeContext {
                     self.clone()
                 }
             }
+            "font" => {
+                if let Some(font_family) = tag.simple_param() {
+                    Self {
+                        font_family: font_family.clone(),
+                        ..self.clone()
+                    }
+                } else {
+                    warn!("Missing font family name on [{}] tag", tag.name());
+                    self.clone()
+                }
+            }
             _ => self.clone(),
         }
     }
@@ -103,6 +116,7 @@ pub fn convert_bbcode(
         construct_recursively(
             &mut entity_commands,
             BbcodeContext {
+                font_family: settings.font_family.clone(),
                 is_bold: false,
                 is_italic: false,
                 color: settings.color.clone(),
@@ -128,7 +142,10 @@ fn construct_recursively(
         match **node {
             BbcodeNode::Text(ref text) => {
                 let font_query = fontdb::Query {
-                    families: &[fontdb::Family::Name(&settings.font_family)],
+                    families: &[
+                        fontdb::Family::Name(&context.font_family),
+                        fontdb::Family::Name(&settings.font_family),
+                    ],
                     weight: if context.is_bold {
                         fontdb::Weight::BOLD
                     } else {
