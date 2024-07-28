@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use nom::{
     branch::alt,
-    bytes::complete::{is_not, tag, tag_no_case, take_while1},
+    bytes::complete::{is_not, tag, tag_no_case},
     character::complete::{alpha1, char},
     combinator::{map, opt, value, verify},
     error::ParseError,
@@ -31,7 +31,7 @@ fn parse_bbcode_internal<'a, E: ParseError<&'a str>>(
 
 fn parse_node<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, BbcodeNode, E> {
     alt((
-        map(parse_text, |text| BbcodeNode::Text(text.into())),
+        map(parse_text, BbcodeNode::Text),
         map(parse_tag, BbcodeNode::Tag),
     ))(input)
 }
@@ -69,8 +69,8 @@ fn parse_closing_tag<'a, E: ParseError<&'a str>>(
     )(input)
 }
 
-fn parse_text<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, &'a str, E> {
-    take_while1(|ch| !['[', ']'].contains(&ch))(input)
+fn parse_text<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, String, E> {
+    parse_inner_string("[]\\").parse(input)
 }
 
 fn parse_param<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, String, E> {
@@ -154,6 +154,17 @@ mod tests {
     fn test_parse_simple() {
         let input = "[b]test[/b]";
         let expected_tag = BbcodeTag::new("b").with_text("test");
+
+        assert_eq!(
+            parse_bbcode(input),
+            Ok(("", vec![BbcodeNode::Tag(expected_tag).into()]))
+        )
+    }
+
+    #[test]
+    fn test_parse_escaped_text() {
+        let input = r#"[b]\[\]\\\"\t\n[/b]"#;
+        let expected_tag = BbcodeTag::new("b").with_text("[]\\\"\t\n");
 
         assert_eq!(
             parse_bbcode(input),
