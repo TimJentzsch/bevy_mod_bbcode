@@ -1,6 +1,6 @@
 [package]
 name = "bevy_mod_bbcode"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 description = "Use BBCode-formatted text inside of Bevy."
 readme = "README.md"
