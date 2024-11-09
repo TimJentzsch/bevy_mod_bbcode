@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.3.0-rc.1
+
+This release updates to Bevy 0.15, which reworks text and introduces required components.
+
+### No More Bundles
+
+With required components, we no longer need the `BbcodeBundle`.
+Instead, just spawn the `Bbcode` and `BbcodeSettings` components.
+All other needed components will be inserted automatically.
+
+### Query for `TextSpan`
+
+When you wanted to update text dynamically via marker components inserted via BBcode, you used to query for the marker component and `Text`.
+Now, query for `TextSpan` instead, which is what the BBcode markup gets parsed into now.
+
 ## v0.2.0
 
 This release simplifies font handling, adds named colors and adds support for efficiently changing text dynamically.
