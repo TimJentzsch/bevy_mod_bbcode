@@ -6,6 +6,7 @@ Rich text support in Bevy using a custom [BBCode](https://en.wikipedia.org/wiki/
 
 | `bevy` version | `bevy_mod_bbcode` version |
 | -------------- | ------------------------- |
+| `0.15.0-rc.2`  | `0.3.0-rc.1`              |
 | `0.14`         | `0.1` - `0.2`             |
 
 ## Installation
@@ -16,11 +17,11 @@ cargo add bevy_mod_bbcode
 
 ## Usage
 
-Instead of spawning a `TextBundle`, spawn a `BbcodeBundle`!
+Instead of spawning `Text`, spawn `Bbcode`!
 
 ```rs
 use bevy::prelude::*;
-use bevy_mod_bbcode::{BbcodeBundle, BbcodePlugin, BbcodeSettings};
+use bevy_mod_bbcode::{Bbcode, BbcodePlugin, BbcodeSettings};
 
 fn main() {
     App::new()
@@ -30,11 +31,11 @@ fn main() {
         .run();
 }
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn(Camera2dBundle::default());
+fn setup(mut commands: Commands) {
+    commands.spawn(Camera2d);
 
-    commands.spawn(BbcodeBundle::from_content(
-        "test [b]bold[/b] with [i]italic[/i] and [c=#ff00ff]color[/c]",
+    commands.spawn((Bbcode::new(
+        r"test [b]bold[/b] with [i]italic[/i] and [c=#ff00ff]color[/c]"),
         // Use the "Fira Sans" font family with a default font size of 40
         BbcodeSettings::new("Fira Sans", 40., Color::WHITE),
     ));
