@@ -101,17 +101,15 @@ pub struct BbCodeColored {
 /// Update all colors whose name has changed.
 fn update_colors(
     mut color_map: ResMut<ColorMap>,
-    mut colored_text_query: Query<(&BbCodeColored, &mut Text)>,
+    mut colored_text_query: Query<(&BbCodeColored, &mut TextColor)>,
 ) {
     if !color_map.is_changed() || !color_map.has_update() {
         return;
     }
 
-    for (colored, mut text) in colored_text_query.iter_mut() {
+    for (colored, mut text_color) in colored_text_query.iter_mut() {
         if let Some(color) = color_map.get_update(&colored.name) {
-            for section in &mut text.sections {
-                section.style.color = color;
-            }
+            *text_color = color.into();
         }
     }
 
