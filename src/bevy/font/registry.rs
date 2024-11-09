@@ -1,6 +1,5 @@
-use std::{ops::Deref, sync::Arc};
+use std::ops::Deref;
 
-use ab_glyph::Font as _;
 use bevy::{prelude::*, utils::HashMap};
 use tinyvec::TinyVec;
 
@@ -27,12 +26,10 @@ impl FontRegistry {
             return;
         };
 
-        let data = font.font.font_data().to_vec();
+        let data = font.data.clone();
 
         // Insert the font into the DB
-        let font_ids = self
-            .font_db
-            .load_font_source(fontdb::Source::Binary(Arc::new(data)));
+        let font_ids = self.font_db.load_font_source(fontdb::Source::Binary(data));
 
         // Update the ID maps
         for font_id in &font_ids {
