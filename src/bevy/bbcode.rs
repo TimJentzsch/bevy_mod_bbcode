@@ -5,11 +5,20 @@ use bevy::{ecs::system::EntityCommands, prelude::*, utils::HashMap};
 use super::color::BbCodeColor;
 
 #[derive(Debug, Clone, Component, Default)]
-#[require(Text)]
+#[require(Text, BbcodeSettings)]
 
 pub struct Bbcode {
     /// The bbcode-formatted text.
     pub content: String,
+}
+
+impl Bbcode {
+    /// Create a new Bbcode text with the given content in the Bbcode Markup language.
+    pub fn new<S: Into<String>>(content: S) -> Self {
+        Self {
+            content: content.into(),
+        }
+    }
 }
 
 type ModifierFn = dyn Fn(&mut EntityCommands) + Send + Sync;
@@ -55,5 +64,17 @@ impl BbcodeSettings {
             }),
         );
         self
+    }
+}
+
+impl Default for BbcodeSettings {
+    fn default() -> Self {
+        Self {
+            color: Color::WHITE.into(),
+            // TODO: Revisit what to put as default here
+            font_family: Default::default(),
+            font_size: 20.0,
+            modifiers: Default::default(),
+        }
     }
 }
