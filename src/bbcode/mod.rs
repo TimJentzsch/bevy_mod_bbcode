@@ -1,14 +1,14 @@
-use std::{collections::HashMap, fmt::Display, sync::Arc};
+use std::{borrow::Cow, collections::HashMap, fmt::Display, sync::Arc};
 
 pub mod parser;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum BbcodeNode {
-    Tag(BbcodeTag),
-    Text(String),
+pub enum BbcodeNode<'a> {
+    Tag(BbcodeTag<'a>),
+    Text(Cow<'a, str>),
 }
 
-impl Display for BbcodeNode {
+impl<'a> Display for BbcodeNode<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             BbcodeNode::Tag(node) => node.fmt(f),
@@ -18,7 +18,7 @@ impl Display for BbcodeNode {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct BbcodeTag {
+pub struct BbcodeTag<'a> {
     /// The name of the tag, e.g. `tag` for `[tag]something[/tag]`.
     name: String,
 
@@ -29,10 +29,10 @@ pub struct BbcodeTag {
     complex_params: HashMap<String, String>,
 
     /// The child nodes (or text) contained inside this node.
-    children: Vec<Arc<BbcodeNode>>,
+    children: Vec<Arc<BbcodeNode<'a>>>,
 }
 
-impl BbcodeTag {
+impl<'a> BbcodeTag<'a> {
     /// Create a new, empty tag.
     pub fn new<S: Into<String>>(name: S) -> Self {
         Self {
@@ -65,7 +65,7 @@ impl BbcodeTag {
 
     /// Add a nested tag inside this one.
     #[cfg(test)]
-    pub fn with_tag(mut self, tag: BbcodeTag) -> Self {
+    pub fn with_tag(mut self, tag: BbcodeTag<'a>) -> Self {
         self.children.push(Arc::new(BbcodeNode::Tag(tag)));
         self
     }
@@ -73,7 +73,8 @@ impl BbcodeTag {
     /// Add text inside of the node.
     #[cfg(test)]
     pub fn with_text<T: Into<String>>(mut self, text: T) -> Self {
-        self.children.push(Arc::new(BbcodeNode::Text(text.into())));
+        self.children
+            .push(Arc::new(BbcodeNode::Text(Cow::Owned(text.into()))));
         self
     }
 
@@ -83,7 +84,7 @@ impl BbcodeTag {
     }
 
     /// The child nodes of this tag.
-    pub fn children(&self) -> &Vec<Arc<BbcodeNode>> {
+    pub fn children(&self) -> &Vec<Arc<BbcodeNode<'a>>> {
         &self.children
     }
 
@@ -93,7 +94,7 @@ impl BbcodeTag {
     }
 }
 
-impl Display for BbcodeTag {
+impl Display for BbcodeTag<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         fn fmt_param(param: &str) -> String {
             if param.contains(' ') {
