@@ -161,13 +161,14 @@ fn construct_recursively(
                 let font = font_registry.query_handle(&font_query).unwrap_or_default();
 
                 entity_commands.with_children(|builder| {
-                    let mut text_commands = builder.spawn(TextBundle::from_section(
-                        text.clone(),
-                        TextStyle {
+                    let mut text_commands = builder.spawn((
+                        TextSpan::new(text.clone()),
+                        TextFont {
                             font,
                             font_size: settings.font_size,
-                            color: context.color.to_color(color_map).unwrap_or(Color::WHITE),
+                            ..default()
                         },
+                        TextColor(context.color.to_color(color_map).unwrap_or(Color::WHITE)),
                     ));
 
                     // Track named colors for efficient update

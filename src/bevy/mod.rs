@@ -4,7 +4,7 @@ pub(crate) mod conversion;
 pub(crate) mod font;
 pub(crate) mod plugin;
 
-pub use bbcode::{Bbcode, BbcodeBundle, BbcodeSettings};
+pub use bbcode::{Bbcode, BbcodeSettings};
 pub use color::ColorMap;
 pub use font::*;
 pub use plugin::BbcodePlugin;
