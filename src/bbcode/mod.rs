@@ -20,7 +20,7 @@ impl<'a> Display for BbcodeNode<'a> {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BbcodeTag<'a> {
     /// The name of the tag, e.g. `tag` for `[tag]something[/tag]`.
-    name: String,
+    name: &'a str,
 
     /// A simple parameter for the tag, e.g. `value` for `[tag=value]something[/tag]`.
     simple_param: Option<String>,
@@ -34,9 +34,9 @@ pub struct BbcodeTag<'a> {
 
 impl<'a> BbcodeTag<'a> {
     /// Create a new, empty tag.
-    pub fn new<S: Into<String>>(name: S) -> Self {
+    pub fn new(name: &'a str) -> Self {
         Self {
-            name: name.into(),
+            name,
             simple_param: None,
             complex_params: HashMap::new(),
             children: Vec::new(),
@@ -80,7 +80,7 @@ impl<'a> BbcodeTag<'a> {
 
     /// The name of this tag.
     pub fn name(&self) -> &str {
-        &self.name
+        self.name
     }
 
     /// The child nodes of this tag.

@@ -39,7 +39,7 @@ fn parse_node<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, Bb
 fn parse_tag<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, BbcodeTag<'a>, E> {
     let (input, mut tag) = parse_opening_tag(input)?;
     let (input, children) = parse_bbcode_internal(input)?;
-    let (input, _) = parse_closing_tag(input, &tag.name)?;
+    let (input, _) = parse_closing_tag(input, tag.name)?;
 
     tag.children = children;
 
