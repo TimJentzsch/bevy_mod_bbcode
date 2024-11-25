@@ -10,6 +10,10 @@ keywords = ["gamedev", "bevy"]
 categories = ["game-development"]
 exclude = ["assets/**/*", ".github/**/*"]
 
+[[bench]]
+name = "parsing"
+harness = false
+
 [dependencies]
 ab_glyph = "0.2.28"
 fontdb = "0.20.0"
@@ -20,6 +24,9 @@ tinyvec = "1.8.0"
 version = "0.15.0-rc.2"
 default-features = false
 features = ["bevy_text", "bevy_ui"]
+
+[dev-dependencies]
+criterion = "0.5.1"
 
 [dev-dependencies.bevy]
 version = "0.15.0-rc.2"
