@@ -15,6 +15,10 @@ All other needed components will be inserted automatically.
 When you wanted to update text dynamically via marker components inserted via BBcode, you used to query for the marker component and `Text`.
 Now, query for `TextSpan` instead, which is what the BBcode markup gets parsed into now.
 
+### Improved performance
+
+Parsing now performs less allocations, improving its performance.
+
 ## v0.2.0
 
 This release simplifies font handling, adds named colors and adds support for efficiently changing text dynamically.
