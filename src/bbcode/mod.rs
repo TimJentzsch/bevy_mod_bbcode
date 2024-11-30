@@ -23,10 +23,10 @@ pub struct BbcodeTag<'a> {
     name: &'a str,
 
     /// A simple parameter for the tag, e.g. `value` for `[tag=value]something[/tag]`.
-    simple_param: Option<String>,
+    simple_param: Option<Cow<'a, str>>,
 
     /// Complex parameters, e.g. the map `value1` -> `xxx`, `value2` -> `yyy` for `[tag value1=”xxx” value2=”yyy”]something[/tag]`.
-    complex_params: HashMap<String, String>,
+    complex_params: HashMap<Cow<'a, str>, Cow<'a, str>>,
 
     /// The child nodes (or text) contained inside this node.
     children: Vec<Arc<BbcodeNode<'a>>>,
@@ -51,14 +51,14 @@ impl<'a> BbcodeTag<'a> {
     }
 
     /// Add a simple parameter to the tag.
-    pub fn add_simple_param<P: Into<String>>(&mut self, tag_param: P) -> &mut Self {
+    pub fn add_simple_param<P: Into<Cow<'a, str>>>(&mut self, tag_param: P) -> &mut Self {
         self.simple_param = Some(tag_param.into());
         self
     }
 
     /// Add a key/value parameter.
     #[cfg(test)]
-    pub fn with_param<K: Into<String>, V: Into<String>>(mut self, key: K, value: V) -> Self {
+    pub fn with_param<K: Into<&'a str>, V: Into<Cow<'a, str>>>(mut self, key: K, value: V) -> Self {
         self.complex_params.insert(key.into(), value.into());
         self
     }
@@ -89,7 +89,7 @@ impl<'a> BbcodeTag<'a> {
     }
 
     /// If it exists, the simple tag parameter of this tag.
-    pub fn simple_param(&self) -> &Option<String> {
+    pub fn simple_param(&self) -> &Option<Cow<'a, str>> {
         &self.simple_param
     }
 }
