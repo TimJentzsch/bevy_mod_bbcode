@@ -6,7 +6,7 @@ Rich text support in Bevy using a custom [BBCode](https://en.wikipedia.org/wiki/
 
 | `bevy` version | `bevy_mod_bbcode` version |
 | -------------- | ------------------------- |
-| `0.15.0-rc.2`  | `0.3.0-rc.1`              |
+| `0.15`         | `0.3`                     |
 | `0.14`         | `0.1` - `0.2`             |
 
 ## Installation

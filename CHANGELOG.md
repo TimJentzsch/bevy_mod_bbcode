@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.3.0-rc.1
+## v0.3.0
 
 This release updates to Bevy 0.15, which reworks text and introduces required components.
 
