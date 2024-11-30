@@ -25,7 +25,7 @@ pub fn parse_bbcode(input: &str) -> IResult<&str, Vec<Arc<BbcodeNode>>> {
 
 fn parse_bbcode_internal<'a, E: ParseError<&'a str>>(
     input: &'a str,
-) -> IResult<&'a str, Vec<Arc<BbcodeNode>>, E> {
+) -> IResult<&'a str, Vec<Arc<BbcodeNode<'a>>>, E> {
     many0(map(parse_node, |element| element.into()))(input)
 }
 
@@ -46,7 +46,9 @@ fn parse_tag<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, Bbc
     Ok((input, tag))
 }
 
-fn parse_opening_tag<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, BbcodeTag, E> {
+fn parse_opening_tag<'a, E: ParseError<&'a str>>(
+    input: &'a str,
+) -> IResult<&'a str, BbcodeTag<'a>, E> {
     let (mut input, mut tag) = map(preceded(char('['), alpha1), BbcodeTag::new)(input)?;
 
     if let Ok((new_input, simple_param)) = preceded(char('='), parse_param::<E>)(input) {

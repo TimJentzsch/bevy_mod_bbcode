@@ -6,7 +6,6 @@ use super::color::BbCodeColor;
 
 #[derive(Debug, Clone, Component, Default)]
 #[require(Text, BbcodeSettings)]
-
 pub struct Bbcode {
     /// The bbcode-formatted text.
     pub content: String,

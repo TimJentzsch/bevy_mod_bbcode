@@ -8,7 +8,7 @@ pub enum BbcodeNode<'a> {
     Text(Cow<'a, str>),
 }
 
-impl<'a> Display for BbcodeNode<'a> {
+impl Display for BbcodeNode<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             BbcodeNode::Tag(node) => node.fmt(f),
@@ -26,7 +26,7 @@ pub struct BbcodeTag<'a> {
     simple_param: Option<Cow<'a, str>>,
 
     /// Complex parameters, e.g. the map `value1` -> `xxx`, `value2` -> `yyy` for `[tag value1=”xxx” value2=”yyy”]something[/tag]`.
-    complex_params: HashMap<Cow<'a, str>, Cow<'a, str>>,
+    complex_params: HashMap<&'a str, Cow<'a, str>>,
 
     /// The child nodes (or text) contained inside this node.
     children: Vec<Arc<BbcodeNode<'a>>>,
@@ -45,7 +45,7 @@ impl<'a> BbcodeTag<'a> {
 
     /// Add a simple parameter to the tag.
     #[cfg(test)]
-    pub fn with_simple_param<P: Into<String>>(mut self, tag_param: P) -> Self {
+    pub fn with_simple_param<P: Into<Cow<'a, str>>>(mut self, tag_param: P) -> Self {
         self.simple_param = Some(tag_param.into());
         self
     }
