@@ -1,14 +1,14 @@
-use std::{collections::HashMap, fmt::Display, sync::Arc};
+use std::{borrow::Cow, collections::HashMap, fmt::Display, sync::Arc};
 
 pub mod parser;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum BbcodeNode {
-    Tag(BbcodeTag),
-    Text(String),
+pub enum BbcodeNode<'a> {
+    Tag(BbcodeTag<'a>),
+    Text(Cow<'a, str>),
 }
 
-impl Display for BbcodeNode {
+impl Display for BbcodeNode<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             BbcodeNode::Tag(node) => node.fmt(f),
@@ -18,25 +18,25 @@ impl Display for BbcodeNode {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct BbcodeTag {
+pub struct BbcodeTag<'a> {
     /// The name of the tag, e.g. `tag` for `[tag]something[/tag]`.
-    name: String,
+    name: &'a str,
 
     /// A simple parameter for the tag, e.g. `value` for `[tag=value]something[/tag]`.
-    simple_param: Option<String>,
+    simple_param: Option<Cow<'a, str>>,
 
     /// Complex parameters, e.g. the map `value1` -> `xxx`, `value2` -> `yyy` for `[tag value1=”xxx” value2=”yyy”]something[/tag]`.
-    complex_params: HashMap<String, String>,
+    complex_params: HashMap<&'a str, Cow<'a, str>>,
 
     /// The child nodes (or text) contained inside this node.
-    children: Vec<Arc<BbcodeNode>>,
+    children: Vec<Arc<BbcodeNode<'a>>>,
 }
 
-impl BbcodeTag {
+impl<'a> BbcodeTag<'a> {
     /// Create a new, empty tag.
-    pub fn new<S: Into<String>>(name: S) -> Self {
+    pub fn new(name: &'a str) -> Self {
         Self {
-            name: name.into(),
+            name,
             simple_param: None,
             complex_params: HashMap::new(),
             children: Vec::new(),
@@ -45,27 +45,27 @@ impl BbcodeTag {
 
     /// Add a simple parameter to the tag.
     #[cfg(test)]
-    pub fn with_simple_param<P: Into<String>>(mut self, tag_param: P) -> Self {
+    pub fn with_simple_param<P: Into<Cow<'a, str>>>(mut self, tag_param: P) -> Self {
         self.simple_param = Some(tag_param.into());
         self
     }
 
     /// Add a simple parameter to the tag.
-    pub fn add_simple_param<P: Into<String>>(&mut self, tag_param: P) -> &mut Self {
+    pub fn add_simple_param<P: Into<Cow<'a, str>>>(&mut self, tag_param: P) -> &mut Self {
         self.simple_param = Some(tag_param.into());
         self
     }
 
     /// Add a key/value parameter.
     #[cfg(test)]
-    pub fn with_param<K: Into<String>, V: Into<String>>(mut self, key: K, value: V) -> Self {
+    pub fn with_param<K: Into<&'a str>, V: Into<Cow<'a, str>>>(mut self, key: K, value: V) -> Self {
         self.complex_params.insert(key.into(), value.into());
         self
     }
 
     /// Add a nested tag inside this one.
     #[cfg(test)]
-    pub fn with_tag(mut self, tag: BbcodeTag) -> Self {
+    pub fn with_tag(mut self, tag: BbcodeTag<'a>) -> Self {
         self.children.push(Arc::new(BbcodeNode::Tag(tag)));
         self
     }
@@ -73,27 +73,28 @@ impl BbcodeTag {
     /// Add text inside of the node.
     #[cfg(test)]
     pub fn with_text<T: Into<String>>(mut self, text: T) -> Self {
-        self.children.push(Arc::new(BbcodeNode::Text(text.into())));
+        self.children
+            .push(Arc::new(BbcodeNode::Text(Cow::Owned(text.into()))));
         self
     }
 
     /// The name of this tag.
     pub fn name(&self) -> &str {
-        &self.name
+        self.name
     }
 
     /// The child nodes of this tag.
-    pub fn children(&self) -> &Vec<Arc<BbcodeNode>> {
+    pub fn children(&self) -> &Vec<Arc<BbcodeNode<'a>>> {
         &self.children
     }
 
     /// If it exists, the simple tag parameter of this tag.
-    pub fn simple_param(&self) -> &Option<String> {
+    pub fn simple_param(&self) -> &Option<Cow<'a, str>> {
         &self.simple_param
     }
 }
 
-impl Display for BbcodeTag {
+impl Display for BbcodeTag<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         fn fmt_param(param: &str) -> String {
             if param.contains(' ') {

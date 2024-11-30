@@ -48,7 +48,7 @@ impl BbcodeContext {
                         }
                     } else {
                         Self {
-                            color: color.clone().into(),
+                            color: color.to_string().into(),
                             ..self.clone()
                         }
                     }
@@ -60,7 +60,7 @@ impl BbcodeContext {
             "m" | "marker" => {
                 if let Some(marker) = tag.simple_param() {
                     let mut markers = self.markers.clone();
-                    markers.push(marker.clone());
+                    markers.push(marker.to_string());
 
                     Self {
                         markers,
@@ -74,7 +74,7 @@ impl BbcodeContext {
             "font" => {
                 if let Some(font_family) = tag.simple_param() {
                     Self {
-                        font_family: font_family.clone(),
+                        font_family: font_family.to_string(),
                         ..self.clone()
                     }
                 } else {

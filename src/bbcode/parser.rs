@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{borrow::Cow, sync::Arc};
 
 use nom::{
     branch::alt,
@@ -25,28 +25,30 @@ pub fn parse_bbcode(input: &str) -> IResult<&str, Vec<Arc<BbcodeNode>>> {
 
 fn parse_bbcode_internal<'a, E: ParseError<&'a str>>(
     input: &'a str,
-) -> IResult<&'a str, Vec<Arc<BbcodeNode>>, E> {
+) -> IResult<&'a str, Vec<Arc<BbcodeNode<'a>>>, E> {
     many0(map(parse_node, |element| element.into()))(input)
 }
 
-fn parse_node<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, BbcodeNode, E> {
+fn parse_node<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, BbcodeNode<'a>, E> {
     alt((
         map(parse_text, BbcodeNode::Text),
         map(parse_tag, BbcodeNode::Tag),
     ))(input)
 }
 
-fn parse_tag<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, BbcodeTag, E> {
+fn parse_tag<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, BbcodeTag<'a>, E> {
     let (input, mut tag) = parse_opening_tag(input)?;
     let (input, children) = parse_bbcode_internal(input)?;
-    let (input, _) = parse_closing_tag(input, &tag.name)?;
+    let (input, _) = parse_closing_tag(input, tag.name)?;
 
     tag.children = children;
 
     Ok((input, tag))
 }
 
-fn parse_opening_tag<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, BbcodeTag, E> {
+fn parse_opening_tag<'a, E: ParseError<&'a str>>(
+    input: &'a str,
+) -> IResult<&'a str, BbcodeTag<'a>, E> {
     let (mut input, mut tag) = map(preceded(char('['), alpha1), BbcodeTag::new)(input)?;
 
     if let Ok((new_input, simple_param)) = preceded(char('='), parse_param::<E>)(input) {
@@ -69,19 +71,21 @@ fn parse_closing_tag<'a, E: ParseError<&'a str>>(
     )(input)
 }
 
-fn parse_text<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, String, E> {
+fn parse_text<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, Cow<'a, str>, E> {
     parse_inner_string("[]\\").parse(input)
 }
 
-fn parse_param<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, String, E> {
+fn parse_param<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, Cow<'a, str>, E> {
     alt((
         parse_quoted_string,
-        map(parse_literal("\"\\[]"), |literal| literal.to_string()),
+        map(parse_literal("\"\\[]"), Cow::Borrowed),
     ))
     .parse(input)
 }
 
-fn parse_quoted_string<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, String, E> {
+fn parse_quoted_string<'a, E: ParseError<&'a str>>(
+    input: &'a str,
+) -> IResult<&'a str, Cow<'a, str>, E> {
     delimited(
         char('"'),
         map(opt(parse_inner_string("\"\\")), |string| {
@@ -94,17 +98,25 @@ fn parse_quoted_string<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'
 
 fn parse_inner_string<'a, E: ParseError<&'a str>>(
     exclude: &'a str,
-) -> impl Parser<&'a str, String, E> {
+) -> impl Parser<&'a str, Cow<'a, str>, E> {
     move |input| {
         fold_many1(
             parse_fragment(exclude),
-            String::new,
-            |mut string, fragment| {
+            Cow::<'a, str>::default,
+            |mut cow, fragment| {
                 match fragment {
-                    StringFragment::Literal(s) => string.push_str(s),
-                    StringFragment::EscapedChar(c) => string.push(c),
+                    StringFragment::Literal(s) => {
+                        if cow.is_empty() {
+                            cow = Cow::Borrowed(s);
+                        } else {
+                            cow.to_mut().push_str(s);
+                        }
+                    }
+                    StringFragment::EscapedChar(c) => {
+                        cow.to_mut().push(c);
+                    }
                 }
-                string
+                cow
             },
         )
         .parse(input)
