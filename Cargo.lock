@@ -841,7 +841,7 @@ version = "0.3.0-rc.1"
 dependencies = [
  "bevy",
  "criterion",
- "fontdb 0.20.0",
+ "fontdb 0.23.0",
  "nom",
  "tinyvec",
 ]
@@ -2127,16 +2127,16 @@ dependencies = [
 
 [[package]]
 name = "fontdb"
-version = "0.20.0"
+version = "0.23.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "41f874d3f04ab8bf6f591358b03e4f1e084e396c4263a1c29ebbaa0feff7ba99"
+checksum = "457e789b3d1202543297a350643cf459f836cade38934e7a4cf6a39e7cde2905"
 dependencies = [
  "fontconfig-parser",
  "log",
  "memmap2",
  "slotmap",
  "tinyvec",
- "ttf-parser 0.24.0",
+ "ttf-parser 0.25.1",
 ]
 
 [[package]]
@@ -4146,9 +4146,9 @@ checksum = "2c591d83f69777866b9126b24c6dd9a18351f177e49d625920d19f989fd31cf8"
 
 [[package]]
 name = "ttf-parser"
-version = "0.24.0"
+version = "0.25.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8686b91785aff82828ed725225925b33b4fde44c4bb15876e5f7c832724c420a"
+checksum = "d2df906b07856748fa3f6e0ad0cbaa047052d4a7dd609e231c4f72cee8c36f31"
 dependencies = [
  "core_maths",
 ]
